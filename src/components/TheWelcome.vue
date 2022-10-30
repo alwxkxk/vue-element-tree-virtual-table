@@ -19,7 +19,10 @@
       label="名字"
     >
       <template slot-scope="scope">
+        <!-- 计算缩进，如果有子节点代表还会多出一个展开图标，所以给无子节点的再加上展开图标的大小。 -->
         <div :style="{'margin-left': `${(scope.row._levelNum * 8 + (scope.row._childrenNum>0?0:14))}px`}">
+
+        <!-- 自行实现树形表格的展开功能 -->
           <i 
             v-if="scope.row._childrenNum>0" 
             :class="`${scope.row._isExpand?'el-icon-arrow-down':'el-icon-arrow-right'}`"
@@ -137,9 +140,9 @@ function traverseTree (data, callback, childrenKey = 'children') {
       this.initVirtualElement()
       
       this.updateViewData()
+      // 添加滚动事件，滚动时再触发一次计算
       this.$refs.table.bodyWrapper.addEventListener('scroll', this.updateViewData)
 
-      // TODO:自行根据层数来做 折叠效果 与缩进效果
       console.log('this.tableData',this.tableData)
     },
     methods: {
@@ -193,8 +196,10 @@ function traverseTree (data, callback, childrenKey = 'children') {
         const top = rowStartNum * this.rowHeight + 'px'
         const bottom = (tableViewData.length + 1 - rowEndNum)  * this.rowHeight + 'px'
         console.log('top',top,bottom)
+        // 调整占位元素的高度
         this.topElement.style.height = top
         this.bottomElement.style.height = bottom
+        // 表格只显示要显示的行数内容
         this.tableViewData = tableViewData.slice(rowStartNum,rowEndNum)
 
       },
@@ -218,7 +223,6 @@ function traverseTree (data, callback, childrenKey = 'children') {
           parentName = this.parentNameObj[parent.name]
         }
         return flag
-
       },
       toggleExpand(row){
         this.$set(row,'_isExpand',!row._isExpand)
